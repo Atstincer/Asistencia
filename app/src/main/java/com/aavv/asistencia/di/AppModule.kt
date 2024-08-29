@@ -5,8 +5,10 @@ import androidx.room.Room
 import com.aavv.asistencia.bd.MyDataBase
 import com.aavv.asistencia.daos.AgenciaDao
 import com.aavv.asistencia.daos.HotelDao
+import com.aavv.asistencia.daos.ReservaDao
 import com.aavv.asistencia.repositories.AgenciaRepository
 import com.aavv.asistencia.repositories.HotelRepository
+import com.aavv.asistencia.repositories.ReservaRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,21 +26,16 @@ object AppModule {
             context = app,
             klass = MyDataBase::class.java,
             name = "mydb")
-            .allowMainThreadQueries()
+//            .allowMainThreadQueries()
             .fallbackToDestructiveMigration()
             .build()
     }
+
 
     @Provides
     @Singleton
     fun provideHotelDao(db: MyDataBase): HotelDao {
         return db.hotelDao
-    }
-
-    @Provides
-    @Singleton
-    fun provideHotelRepo(dao: HotelDao): HotelRepository {
-        return HotelRepository(dao)
     }
 
     @Provides
@@ -49,7 +46,27 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideReservaDao(db: MyDataBase): ReservaDao {
+        return db.reservaDao
+    }
+        
+
+
+    @Provides
+    @Singleton
+    fun provideHotelRepo(dao: HotelDao): HotelRepository {
+        return HotelRepository(dao)
+    }
+
+    @Provides
+    @Singleton
     fun provideAgenciaRepo(dao: AgenciaDao): AgenciaRepository {
         return AgenciaRepository(dao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideReservaRepo(dao: ReservaDao): ReservaRepository {
+        return ReservaRepository(dao)
     }
 }

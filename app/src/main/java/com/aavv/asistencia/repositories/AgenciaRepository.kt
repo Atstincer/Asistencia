@@ -14,9 +14,10 @@ class AgenciaRepository (val agenciaDao: AgenciaDao) {
 
     suspend fun deleteAgencia(id: Int) = agenciaDao.deleteAgencia(id)
 
-    fun getAgencia(id: Int): Agencia {
-        val agencia = agenciaDao.getAgencia(id)
-        return if(agencia != null) agencia else Agencia.getEmptyAgencia()
+    fun getAgencia(id: Int): Flow<Agencia> {
+        //val agencia = agenciaDao.getAgencia(id)
+        //return if(agencia != null) agencia else Agencia.getEmptyAgencia()
+        return agenciaDao.getAgencia(id)
     }
 
     fun getAllAgencias(tipo: TipoAgencia) = agenciaDao.getAllAgencias(tipo)

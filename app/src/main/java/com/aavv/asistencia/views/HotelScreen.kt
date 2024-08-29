@@ -4,14 +4,12 @@ package com.aavv.asistencia.views
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -45,11 +44,12 @@ import com.aavv.asistencia.viewmodels.HotelsScreenVM
 
 
 @Composable
-fun HotelsScreen(vm: HotelsScreenVM = hiltViewModel()){
+fun HotelsScreen(drawerState: DrawerState,vm: HotelsScreenVM = hiltViewModel()){
     val estado = vm.estado
     BackHandler (enabled = (estado.estado == Estado.EDITAR)) { vm.setRegularMode() }
-    Scaffold(modifier = Modifier.fillMaxSize(),
-        topBar = { MyTopAppBar() }) { innerPadding ->
+    Scaffold(modifier = Modifier
+        .fillMaxSize(),
+        topBar = { MyTopAppBar(drawerState) }) {innerPadding ->
         Column(modifier = Modifier
             .padding(innerPadding)
             .padding(all = 10.dp)) {
@@ -60,6 +60,7 @@ fun HotelsScreen(vm: HotelsScreenVM = hiltViewModel()){
             LayoutHotelesRegistrados()
         }
     }
+
     if(vm.estado.mostrarDialogConfirmEliminar){
         DialogConfirmEliminar(
             title = "Confirmar",

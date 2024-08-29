@@ -19,10 +19,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -33,27 +33,36 @@ import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.aavv.asistencia.constantes.Estado
 import com.aavv.asistencia.constantes.TipoAgencia
 import com.aavv.asistencia.models.Agencia
 import com.aavv.asistencia.viewmodels.AgenciasScreenVM
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.last
 
 @Composable
-fun AgenciasScreen(vm: AgenciasScreenVM = hiltViewModel()){
+fun AgenciasScreen(drawerState: DrawerState,vm: AgenciasScreenVM = hiltViewModel()){
     val scrollState = rememberScrollState()
     BackHandler(enabled = vm.estado.estado == Estado.EDITAR) {
         vm.setRegularMode()
     }
+    Log.d("agencia","Recomponiendo agencia screem")
     Scaffold(modifier = Modifier
         .fillMaxSize(),
-        topBar = { MyTopAppBar() }) {innerPadding ->
-
+        topBar = { MyTopAppBar(drawerState) }) {innerPadding ->
         Column(modifier = Modifier
             .padding(innerPadding)
             .padding(all = 10.dp)
@@ -65,6 +74,7 @@ fun AgenciasScreen(vm: AgenciasScreenVM = hiltViewModel()){
                 .padding(vertical = 20.dp))
             LayoutAgenciasRegistradas()
         }
+
         if(vm.estado.showDialogConfirEliminar){
             DialogConfirmEliminar(
                 "Confirmar",
@@ -169,15 +179,19 @@ fun LayoutAgenciasRegistradas(vm: AgenciasScreenVM = hiltViewModel()){
                 modifier = Modifier.padding(bottom = 10.dp))
         }
         items(agenciasList.value.sortedBy { it.name }){agencia ->
-            AgenciaCard(agencia = agencia)
+            val receptivo: Agencia = if(agencia.idReceptivoAsociado <= 0) Agencia.getEmptyAgencia() else
+                if(agenciasList.value.filter { it.id == agencia.idReceptivoAsociado }.size >= 1) {
+                    agenciasList.value.filter { it.id == agencia.idReceptivoAsociado }[0]
+                } else { Agencia.getEmptyAgencia() }
+            AgenciaCard(agencia = agencia,receptivo)
         }
     }
 }
 
 @Composable
-fun AgenciaCard(agencia: Agencia, vm: AgenciasScreenVM = hiltViewModel()){
+fun AgenciaCard(agencia: Agencia, receptivo: Agencia, vm: AgenciasScreenVM = hiltViewModel()){
     ElevatedCard(
-        onClick = { vm.setEditarMode(agencia) },
+        onClick = { vm.setEditarMode(agencia, receptivo) },
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -186,6 +200,7 @@ fun AgenciaCard(agencia: Agencia, vm: AgenciasScreenVM = hiltViewModel()){
         Column (modifier = Modifier
             .fillMaxWidth()
             .padding(all = 5.dp)) {
+            val showInfoReceptivo = agencia.idReceptivoAsociado > 0
             Text(text = agencia.name, fontWeight = FontWeight.Bold)
             Row (modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -193,12 +208,11 @@ fun AgenciaCard(agencia: Agencia, vm: AgenciasScreenVM = hiltViewModel()){
                 Text(text = agencia.tipo.name, style = MaterialTheme.typography.bodySmall)
                 Text(text = if(agencia.activa) "ACTIVA" else "NO ACTIVA", style = MaterialTheme.typography.bodySmall)
             }
-            if(agencia.tipo == TipoAgencia.MAYORISTA) {
-                Log.d("agencia","agencia(id= ${agencia.id}, name= ${agencia.name}, " +
-                        "idReceptivo = ${agencia.idReceptivoAsociado}, tipo = ${agencia.tipo.name}, activa = ${agencia.activa})")
-                val receptivo = vm.getAgencia(agencia.idReceptivoAsociado)
+            Log.d("agencia","Recomponiendo Card")
+            if(showInfoReceptivo) {
+                Log.d("agencia","dentro del if agencia ${agencia.name}")
                 Text(
-                    text = "receptivo: " + receptivo.name.ifEmpty { "NINGUNO" },
+                    text = "receptivo: ${receptivo.name.ifEmpty { "NINGUNO" }}", //+ receptivo.value.name.ifEmpty { "NINGUNO" },
                     style = MaterialTheme.typography.bodySmall
                 )
             }

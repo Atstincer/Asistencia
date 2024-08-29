@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.aavv.asistencia.ui.theme.AsistenciaTheme
-import com.aavv.asistencia.views.HotelsScreen
+import com.aavv.asistencia.views.MainNavigation
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -16,9 +16,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AsistenciaTheme {
-                HotelsScreen()
-                //AgenciasScreen()
+                MainNavigation()
             }
         }
     }
 }
+

@@ -11,7 +11,10 @@ import com.aavv.asistencia.models.Agencia
 import com.aavv.asistencia.repositories.AgenciaRepository
 import com.aavv.asistencia.viewmodels.estados.AgenciaEstado
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,6 +24,22 @@ class AgenciasScreenVM @Inject constructor(private val repository: AgenciaReposi
     var estado by mutableStateOf(AgenciaEstado())
         private set
 
+    /*
+    private val _agenciasListStateFlow = MutableStateFlow(emptyList<Agencia>())
+    //val agenciasStateFlow: StateFlow<List<Agencia>> = _agenciasListStateFlow
+
+
+    init {
+        viewModelScope.launch {
+            getAllAgencias().collect{ agenciasList ->
+                _agenciasListStateFlow.value = agenciasList
+            }
+        }
+    }
+
+    fun getListaDeAgencias(): List<Agencia>{
+        return _agenciasListStateFlow.value
+    }*/
 
     fun getTextLabelReceptivo(): String{
         return if (estado.receptivo.id <= 0) "receptivo: NINGUNO" else "receptivo: ${estado.receptivo.name}"
@@ -38,13 +57,13 @@ class AgenciasScreenVM @Inject constructor(private val repository: AgenciaReposi
         )
     }
 
-    fun setEditarMode(agencia: Agencia){
+    fun setEditarMode(agencia: Agencia, receptivo: Agencia){
         setAgenciaSelected(agencia)
         setName(agencia.name)
         setTipo(agencia.tipo)
         setActiva(agencia.activa)
         setEstado(Estado.EDITAR)
-        setReceptivo(getAgencia(agencia.idReceptivoAsociado))
+        setReceptivo(receptivo)
     }
 
     fun setRegularMode(){
@@ -130,7 +149,7 @@ class AgenciasScreenVM @Inject constructor(private val repository: AgenciaReposi
         return repository.getAllAgencias(tipo)
     }
 
-    fun getAgencia(id: Int): Agencia{
+    fun getAgencia(id: Int): Flow<Agencia>{
         return repository.getAgencia(id)
     }
 

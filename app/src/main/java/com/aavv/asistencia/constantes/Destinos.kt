@@ -1,6 +1,6 @@
 package com.aavv.asistencia.constantes
 
-enum class Destinos() {
+enum class Destinos {
     DESCONOCIDO,
     HABANA,
     VARADERO,

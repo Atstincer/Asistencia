@@ -21,7 +21,7 @@ interface AgenciaDao {
     suspend fun deleteAgencia(id: Int)
 
     @Query("SELECT * FROM agencia WHERE id=:id")
-    fun getAgencia(id: Int): Agencia?
+    fun getAgencia(id: Int): Flow<Agencia>
 
     @Query("SELECT * FROM agencia WHERE tipo=:tipo")
     fun getAllAgencias(tipo: TipoAgencia): Flow<List<Agencia>>

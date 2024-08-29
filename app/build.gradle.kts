@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
 
     // navigation
-    // alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.kotlinx.serialization)
 
     id("kotlin-kapt")
 
@@ -13,12 +13,12 @@ plugins {
 
 android {
     namespace = "com.aavv.asistencia"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.aavv.asistencia"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -86,8 +86,8 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
 
     // for navigation
-    // implementation(libs.androidx.navigation.compose)
-    // implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
 }
 
